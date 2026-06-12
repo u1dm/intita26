@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "IdeaCheck AI",
-  description: "AI-сервис первичной оценки бизнес-идей и стартапов"
+  description: "AI-сервіс первинної оцінки бізнес-ідей і стартапів"
 };
 
 export default function RootLayout({

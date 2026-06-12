@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     if (missing.length > 0 || input.description.trim().length < 25 || input.problem.trim().length < 15) {
       return NextResponse.json(
         {
-          error: "Please provide more detail for the business idea, description, and problem."
+          error: "Додайте більше деталей про бізнес-ідею, опис і проблему."
         },
         { status: 400 }
       );
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     console.error("Analyze API error:", error);
     return NextResponse.json(
       {
-        error: "Analysis failed. Please try again."
+        error: "Не вдалося сформувати аналіз. Спробуйте ще раз."
       },
       { status: 500 }
     );
@@ -83,7 +83,7 @@ async function analyzeWithOpenAI(input: IdeaFormData) {
           },
           {
             role: "user",
-            content: `Return a JSON report that exactly matches this TypeScript shape:
+            content: `Поверни JSON-звіт українською мовою, який точно відповідає цій TypeScript-структурі:
 {
   "summary": "string",
   "marketPotential": "string",
@@ -106,9 +106,9 @@ async function analyzeWithOpenAI(input: IdeaFormData) {
   "finalConclusion": "string"
 }
 
-Scores must be numbers from 1 to 10.
+Усі текстові значення мають бути українською. Scores мають бути числами від 1 до 10.
 
-Business idea input:
+Вхідні дані бізнес-ідеї:
 ${JSON.stringify(input, null, 2)}`
           }
         ]

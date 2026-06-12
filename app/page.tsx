@@ -16,22 +16,22 @@ const emptyForm: IdeaFormData = {
 };
 
 const exampleForm: IdeaFormData = {
-  ideaName: "Powerbank rental service for students",
+  ideaName: "Сервіс оренди павербанків для студентів",
   description:
-    "A mobile app and a network of rental stations in universities where students can rent a powerbank for a few hours.",
-  location: "Vinnytsia, Ukraine",
-  targetAudience: "Students, teachers, campus visitors",
-  problem: "People often run out of phone battery during classes or while moving around campus.",
-  monetization: "Hourly payment, subscription, university partnerships",
-  competitors: "Personal powerbanks, charging stations, powerbank rental services in malls",
-  resources: "Small student team, limited budget, 24-hour hackathon prototype"
+    "Мобільний застосунок і мережа станцій в університетах, де студенти можуть орендувати павербанк на кілька годин.",
+  location: "Вінниця, Україна",
+  targetAudience: "Студенти, викладачі, відвідувачі кампусу",
+  problem: "У людей часто розряджається телефон під час занять або пересування кампусом.",
+  monetization: "Погодинна оплата, підписка, партнерства з університетами",
+  competitors: "Власні павербанки, зарядні станції, сервіси оренди павербанків у ТРЦ",
+  resources: "Невелика студентська команда, обмежений бюджет, 24-годинний хакатонний прототип"
 };
 
 const loadingMessages = [
-  "Analyzing idea...",
-  "Checking risks...",
-  "Evaluating business model...",
-  "Preparing report..."
+  "Аналізуємо ідею...",
+  "Перевіряємо ризики...",
+  "Оцінюємо бізнес-модель...",
+  "Готуємо звіт..."
 ];
 
 const fields: {
@@ -42,45 +42,45 @@ const fields: {
 }[] = [
   {
     name: "ideaName",
-    label: "Название идеи",
-    placeholder: "Например: Powerbank rental service for students"
+    label: "Назва ідеї",
+    placeholder: "Наприклад: сервіс оренди павербанків для студентів"
   },
   {
     name: "description",
-    label: "Описание",
-    placeholder: "Коротко опишите продукт, как он работает и для кого.",
+    label: "Опис",
+    placeholder: "Коротко опишіть продукт, як він працює і для кого.",
     multiline: true
   },
   {
     name: "location",
-    label: "Город / страна",
-    placeholder: "Vinnytsia, Ukraine"
+    label: "Місто / країна",
+    placeholder: "Вінниця, Україна"
   },
   {
     name: "targetAudience",
-    label: "Целевая аудитория",
-    placeholder: "Кто будет пользоваться решением?"
+    label: "Цільова аудиторія",
+    placeholder: "Хто буде користуватися рішенням?"
   },
   {
     name: "problem",
     label: "Проблема",
-    placeholder: "Какую боль или задачу решает идея?",
+    placeholder: "Який біль або задачу розв'язує ідея?",
     multiline: true
   },
   {
     name: "monetization",
-    label: "Монетизация",
-    placeholder: "Оплата за час, подписка, партнерства..."
+    label: "Монетизація",
+    placeholder: "Погодинна оплата, підписка, партнерства..."
   },
   {
     name: "competitors",
-    label: "Конкуренты",
-    placeholder: "Прямые и косвенные альтернативы"
+    label: "Конкуренти",
+    placeholder: "Прямі та непрямі альтернативи"
   },
   {
     name: "resources",
-    label: "Ресурсы команды",
-    placeholder: "Команда, бюджет, ограничения, сроки",
+    label: "Ресурси команди",
+    placeholder: "Команда, бюджет, обмеження, терміни",
     multiline: true
   }
 ];
@@ -132,7 +132,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.error || "Не удалось сформировать отчет.");
+        throw new Error(data?.error || "Не вдалося сформувати звіт.");
       }
 
       setReport(data);
@@ -140,7 +140,7 @@ export default function Home() {
         document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Не удалось сформировать отчет.");
+      setError(submitError instanceof Error ? submitError.message : "Не вдалося сформувати звіт.");
     } finally {
       setLoading(false);
     }
@@ -191,11 +191,11 @@ export default function Home() {
             </div>
 
             <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-normal text-ink sm:text-5xl">
-              Быстрая первичная оценка бизнес-идеи перед запуском
+              Швидка первинна оцінка бізнес-ідеї перед запуском
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
-              Начинающим предпринимателям сложно понять, стоит ли тратить время на идею. Сервис собирает ключевые
-              вводные и за минуту формирует понятный отчет для питча, обсуждения с командой и демо жюри.
+              Початківцям складно зрозуміти, чи варто витрачати час на ідею. Сервіс збирає ключові
+              дані й за хвилину формує зрозумілий звіт для пітчу, обговорення з командою та демо перед журі.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -203,22 +203,22 @@ export default function Home() {
                 href="#idea-form"
                 className="inline-flex h-12 items-center justify-center rounded-lg bg-brand px-6 text-sm font-bold text-white shadow-soft transition hover:bg-[#0b3d68]"
               >
-                Проанализировать идею
+                Проаналізувати ідею
               </a>
               <button
                 type="button"
                 onClick={fillExample}
                 className="inline-flex h-12 items-center justify-center rounded-lg border border-line bg-white px-6 text-sm font-bold text-brand transition hover:border-brand hover:bg-slate-50"
               >
-                Заполнить примером
+                Заповнити прикладом
               </button>
             </div>
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3">
               {[
-                ["Фокус", "Только главные гипотезы и риски"],
-                ["Скорость", "Демо работает даже без API-ключа"],
-                ["Результат", "Отчет можно скопировать или скачать"]
+                ["Фокус", "Тільки головні гіпотези та ризики"],
+                ["Швидкість", "Демо працює навіть без API-ключа"],
+                ["Результат", "Звіт можна скопіювати або завантажити"]
               ].map(([title, text]) => (
                 <div key={title} className="rounded-lg border border-line bg-slate-50 p-4">
                   <p className="text-sm font-bold text-ink">{title}</p>
@@ -232,17 +232,17 @@ export default function Home() {
             <div className="rounded-lg border border-line bg-white p-5">
               <div className="flex items-center justify-between gap-4 border-b border-line pb-4">
                 <div>
-                  <p className="text-sm font-bold text-ink">Startup validation report</p>
-                  <p className="mt-1 text-xs text-muted">Market, audience, risks, MVP, scores</p>
+                  <p className="text-sm font-bold text-ink">Звіт перевірки стартапу</p>
+                  <p className="mt-1 text-xs text-muted">Ринок, аудиторія, ризики, MVP, оцінки</p>
                 </div>
                 <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-accent">7.2 / 10</div>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {[
-                  ["Market Potential", "Clear local pilot opportunity"],
-                  ["Target Audience", "Students and campus visitors"],
-                  ["Risks", "Payment intent and operations"],
-                  ["MVP", "Manual pilot with request form"]
+                  ["Потенціал ринку", "Є можливість для локального пілоту"],
+                  ["Цільова аудиторія", "Студенти та відвідувачі кампусу"],
+                  ["Ризики", "Готовність платити та операції"],
+                  ["MVP", "Ручний пілот із формою заявки"]
                 ].map(([title, text]) => (
                   <div key={title} className="rounded-lg border border-line bg-white p-4">
                     <p className="text-sm font-bold text-ink">{title}</p>
@@ -251,9 +251,9 @@ export default function Home() {
                 ))}
               </div>
               <div className="mt-5 rounded-lg bg-brand p-5 text-white">
-                <p className="text-sm font-bold">Final Conclusion</p>
+                <p className="text-sm font-bold">Підсумковий висновок</p>
                 <p className="mt-2 text-sm leading-6 text-blue-50">
-                  Good hackathon MVP if the team validates payment interest early and keeps the first launch narrow.
+                  Хороший хакатонний MVP, якщо команда рано перевірить готовність платити й звузить перший запуск.
                 </p>
               </div>
             </div>
@@ -269,9 +269,9 @@ export default function Home() {
         >
           <div className="flex flex-col gap-3 border-b border-line pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-ink">Данные для анализа</h2>
+              <h2 className="text-2xl font-bold text-ink">Дані для аналізу</h2>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Заполните поля достаточно конкретно, чтобы отчет был полезным для принятия решения.
+                Заповніть поля достатньо конкретно, щоб звіт був корисним для ухвалення рішення.
               </p>
             </div>
             <button
@@ -279,7 +279,7 @@ export default function Home() {
               onClick={fillExample}
               className="h-10 rounded-lg border border-line bg-white px-4 text-sm font-bold text-brand transition hover:border-brand hover:bg-slate-50"
             >
-              Заполнить примером
+              Заповнити прикладом
             </button>
           </div>
 
@@ -318,7 +318,7 @@ export default function Home() {
             disabled={loading}
             className="mt-6 h-12 w-full rounded-lg bg-accent px-6 text-sm font-bold text-white transition hover:bg-[#0b877a] disabled:cursor-not-allowed disabled:bg-slate-300"
           >
-            {loading ? loadingText : "Сгенерировать анализ"}
+            {loading ? loadingText : "Згенерувати аналіз"}
           </button>
         </form>
 
@@ -348,29 +348,29 @@ function ReportView({
   onNew: () => void;
 }) {
   const cards = [
-    ["Summary", report.summary],
-    ["Market Potential", report.marketPotential],
-    ["Business Model", report.businessModel],
+    ["Короткий опис", report.summary],
+    ["Потенціал ринку", report.marketPotential],
+    ["Бізнес-модель", report.businessModel],
     ["MVP", report.mvp],
-    ["Final Conclusion", report.finalConclusion]
+    ["Підсумковий висновок", report.finalConclusion]
   ];
 
   return (
     <div className="rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6">
       <div className="flex flex-col gap-3 border-b border-line pb-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-ink">Готовый отчет</h2>
-          <p className="mt-2 text-sm leading-6 text-muted">Структурированная первичная оценка для демо и обсуждения.</p>
+          <h2 className="text-2xl font-bold text-ink">Готовий звіт</h2>
+          <p className="mt-2 text-sm leading-6 text-muted">Структурована первинна оцінка для демо й обговорення.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button onClick={onCopy} className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-brand hover:border-brand">
-            {copied ? "Скопировано" : "Скопировать"}
+            {copied ? "Скопійовано" : "Скопіювати"}
           </button>
           <button onClick={onDownload} className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-brand hover:border-brand">
-            Скачать .txt
+            Завантажити .txt
           </button>
           <button onClick={onNew} className="rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white hover:bg-[#0b3d68]">
-            Новый анализ
+            Новий аналіз
           </button>
         </div>
       </div>
@@ -382,7 +382,7 @@ function ReportView({
           </InfoCard>
         ))}
 
-        <InfoCard title="Target Audience">
+        <InfoCard title="Цільова аудиторія">
           <div className="grid gap-3 sm:grid-cols-2">
             {report.targetAudience.map((item) => (
               <div key={`${item.segment}-${item.needs}`} className="rounded-lg bg-slate-50 p-4">
@@ -393,13 +393,15 @@ function ReportView({
           </div>
         </InfoCard>
 
-        <InfoCard title="Competitors">
+        <InfoCard title="Конкуренти">
           <div className="grid gap-3">
             {report.competitors.map((item) => (
               <div key={`${item.name}-${item.type}`} className="rounded-lg border border-line p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-bold text-ink">{item.name}</p>
-                  <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold uppercase text-muted">{item.type}</span>
+                  <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold uppercase text-muted">
+                    {competitorTypeLabel(item.type)}
+                  </span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-muted">{item.description}</p>
               </div>
@@ -407,41 +409,41 @@ function ReportView({
           </div>
         </InfoCard>
 
-        <InfoCard title="Risks">
+        <InfoCard title="Ризики">
           <div className="grid gap-3">
             {report.risks.map((risk) => (
               <div key={risk.title} className="rounded-lg border border-line p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-bold text-ink">{risk.title}</p>
-                  <span className={riskBadgeClass(risk.level)}>{risk.level}</span>
+                  <span className={riskBadgeClass(risk.level)}>{riskLevelLabel(risk.level)}</span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-muted">{risk.description}</p>
                 <p className="mt-2 text-sm leading-6 text-ink">
-                  <span className="font-bold">Mitigation:</span> {risk.mitigation}
+                  <span className="font-bold">Як зменшити:</span> {risk.mitigation}
                 </p>
               </div>
             ))}
           </div>
         </InfoCard>
 
-        <InfoCard title="Revenue Streams">
+        <InfoCard title="Джерела доходу">
           <BulletList items={report.revenueStreams} />
         </InfoCard>
 
-        <InfoCard title="Recommendations">
+        <InfoCard title="Рекомендації">
           <BulletList items={report.recommendations} />
         </InfoCard>
 
-        <InfoCard title="Success Metrics">
+        <InfoCard title="Метрики успіху">
           <BulletList items={report.successMetrics} />
         </InfoCard>
 
-        <InfoCard title="Final Scores">
+        <InfoCard title="Підсумкові оцінки">
           <div className="grid gap-3 sm:grid-cols-2">
             {Object.entries(report.scores).map(([label, score]) => (
               <div key={label} className="rounded-lg bg-slate-50 p-4">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm font-bold capitalize text-ink">{label.replace(/([A-Z])/g, " $1")}</p>
+                  <p className="text-sm font-bold text-ink">{scoreLabel(label)}</p>
                   <p className="text-sm font-black text-brand">{score}/10</p>
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
@@ -482,10 +484,10 @@ function EmptyReportState() {
   return (
     <div className="flex min-h-[520px] items-center justify-center rounded-xl border border-dashed border-line bg-white p-8 text-center">
       <div>
-        <p className="text-xl font-bold text-ink">Отчет появится здесь</p>
+        <p className="text-xl font-bold text-ink">Звіт з&apos;явиться тут</p>
         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
-          Заполните форму или используйте демо-пример. После анализа здесь будут карточки с рынком, рисками, MVP,
-          рекомендациями и оценками.
+          Заповніть форму або використайте демо-приклад. Після аналізу тут будуть картки з ринком, ризиками, MVP,
+          рекомендаціями та оцінками.
         </p>
       </div>
     </div>
@@ -498,7 +500,7 @@ function LoadingPanel({ message }: { message: string }) {
       <div className="text-center">
         <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-accent" />
         <p className="mt-5 text-lg font-bold text-ink">{message}</p>
-        <p className="mt-2 text-sm text-muted">Обычно это занимает несколько секунд.</p>
+        <p className="mt-2 text-sm text-muted">Зазвичай це займає кілька секунд.</p>
       </div>
     </div>
   );
@@ -526,15 +528,15 @@ function validateForm(form: IdeaFormData): string {
   const shortField = fields.find((field) => form[field.name].trim().length < 3);
 
   if (shortField) {
-    return `Поле "${shortField.label}" слишком короткое. Добавьте больше деталей.`;
+    return `Поле "${shortField.label}" занадто коротке. Додайте більше деталей.`;
   }
 
   if (form.description.trim().length < 25) {
-    return "Описание слишком короткое. Опишите идею хотя бы в одном полном предложении.";
+    return "Опис занадто короткий. Опишіть ідею хоча б одним повним реченням.";
   }
 
   if (form.problem.trim().length < 15) {
-    return "Описание проблемы слишком короткое. Уточните реальную боль пользователя.";
+    return "Опис проблеми занадто короткий. Уточніть реальний біль користувача.";
   }
 
   return "";
@@ -552,6 +554,33 @@ function riskBadgeClass(level: "low" | "medium" | "high") {
   }
 
   return `${base} bg-emerald-50 text-emerald-700`;
+}
+
+function riskLevelLabel(level: "low" | "medium" | "high") {
+  const labels = {
+    low: "низький",
+    medium: "середній",
+    high: "високий"
+  };
+
+  return labels[level];
+}
+
+function competitorTypeLabel(type: "direct" | "indirect") {
+  return type === "direct" ? "прямий" : "непрямий";
+}
+
+function scoreLabel(label: string) {
+  const labels: Record<string, string> = {
+    marketPotential: "Потенціал ринку",
+    audienceClarity: "Чіткість аудиторії",
+    competitiveness: "Конкурентність",
+    mvpSimplicity: "Простота MVP",
+    riskLevel: "Рівень ризику",
+    overall: "Загальна оцінка"
+  };
+
+  return labels[label] || label;
 }
 
 function slugify(value: string) {

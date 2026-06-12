@@ -1,6 +1,6 @@
 # IdeaCheck AI
 
-Hackathon MVP: AI-сервис первичной оценки бизнес-идей и стартапов.
+Хакатонний MVP: AI-сервіс первинної оцінки бізнес-ідей і стартапів.
 
 ## Запуск
 
@@ -9,39 +9,39 @@ npm install
 npm run dev
 ```
 
-Откройте [http://localhost:3000](http://localhost:3000).
+Відкрийте [http://localhost:3000](http://localhost:3000).
 
 ## AI API
 
-Приложение работает без ключа и возвращает реалистичный mock-отчет.
+Застосунок працює без ключа й повертає реалістичний mock-звіт.
 
-Чтобы включить AI-режим, создайте `.env.local`:
+Щоб увімкнути AI-режим, створіть `.env.local`:
 
 ```bash
 OPENAI_API_KEY=your_api_key_here
 ```
 
-Опционально можно задать модель и OpenAI-compatible endpoint:
+Опційно можна задати модель і OpenAI-compatible endpoint:
 
 ```bash
 OPENAI_MODEL=gpt-4o-mini
 OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
 ```
 
-Для OpenAI-compatible провайдера укажите его chat completions URL, например:
+Для OpenAI-compatible провайдера вкажіть його chat completions URL, наприклад:
 
 ```bash
 OPENAI_MODEL=deepseek-v4-flash-free
 OPENAI_BASE_URL=https://opencode.ai/zen/v1/chat/completions
 ```
 
-## Что входит
+## Що входить
 
-- Главная страница с CTA.
-- Форма бизнес-идеи с валидацией.
-- Кнопка заполнения демо-примером.
+- Головна сторінка з CTA.
+- Форма бізнес-ідеї з валідацією.
+- Кнопка заповнення демо-прикладом.
 - API route `POST /api/analyze`.
-- OpenAI-интеграция при наличии ключа.
+- OpenAI-compatible інтеграція за наявності ключа.
 - Mock-режим без ключа.
-- Карточки результата, риски, рекомендации и оценки 1-10.
-- Копирование и скачивание `.txt` отчета.
+- Картки результату, ризики, рекомендації та оцінки 1-10.
+- Копіювання і завантаження `.txt` звіту.
