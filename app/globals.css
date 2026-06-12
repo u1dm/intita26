@@ -6,6 +6,10 @@
   color-scheme: light;
 }
 
+.dark {
+  color-scheme: dark;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -18,6 +22,11 @@ body {
   min-height: 100vh;
   background: #f8fafc;
   color: #0f172a;
+}
+
+.dark body {
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
 button,
