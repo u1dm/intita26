@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ideacheck-svc
+spec:
+  type: ClusterIP
+  externalIPs:
+    - 192.168.8.248
+    - 193.181.211.79
+    - 10.77.77.2
+  selector:
+    app: ideacheck
+  ports:
+    - port: 3000
+      targetPort: 3000

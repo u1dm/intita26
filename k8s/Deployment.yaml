@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ideacheck
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ideacheck
+  template:
+    metadata:
+      labels:
+        app: ideacheck
+    spec:
+      containers:
+      - name: ideacheck
+        image: ideacheck:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: "1.5Gi"
+            cpu: "2000m"
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
