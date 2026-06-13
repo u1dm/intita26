@@ -10,13 +10,13 @@ const config: Config = {
     extend: {
       colors: {
         ink: "#0f172a",
-        muted: "#64748b",
-        line: "#dbe3ef",
-        brand: "#0f4c81",
-        accent: "#0f9f8f"
+        muted: "#56645d",
+        line: "rgba(11, 51, 41, 0.15)",
+        brand: "#0b3329",
+        accent: "#19483d"
       },
       boxShadow: {
-        soft: "0 18px 50px rgba(15, 23, 42, 0.08)"
+        soft: "0 18px 50px rgba(11, 51, 41, 0.08)"
       }
     }
   },

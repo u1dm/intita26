@@ -1,594 +1,192 @@
-"use client";
+import Link from "next/link";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { reportToText } from "@/lib/report";
-import type { AnalysisReport, IdeaFormData } from "@/lib/types";
-
-const emptyForm: IdeaFormData = {
-  ideaName: "",
-  description: "",
-  location: "",
-  targetAudience: "",
-  problem: "",
-  monetization: "",
-  competitors: "",
-  resources: ""
-};
-
-const exampleForm: IdeaFormData = {
-  ideaName: "Сервіс оренди павербанків для студентів",
-  description:
-    "Мобільний застосунок і мережа станцій в університетах, де студенти можуть орендувати павербанк на кілька годин.",
-  location: "Вінниця, Україна",
-  targetAudience: "Студенти, викладачі, відвідувачі кампусу",
-  problem: "У людей часто розряджається телефон під час занять або пересування кампусом.",
-  monetization: "Погодинна оплата, підписка, партнерства з університетами",
-  competitors: "Власні павербанки, зарядні станції, сервіси оренди павербанків у ТРЦ",
-  resources: "Невелика студентська команда, обмежений бюджет, 24-годинний хакатонний прототип"
-};
-
-const loadingMessages = [
-  "Аналізуємо ідею...",
-  "Перевіряємо ризики...",
-  "Оцінюємо бізнес-модель...",
-  "Готуємо звіт..."
+const reportItems = [
+  ["Ринок", "попит, контекст, обмеження"],
+  ["Аудиторія", "сегменти та реальні потреби"],
+  ["Ризики", "рівень, причина, пом'якшення"],
+  ["MVP", "що можна перевірити першим"],
+  ["Оцінки", "шість числових критеріїв"]
 ];
 
-const fields: {
-  name: keyof IdeaFormData;
-  label: string;
-  placeholder: string;
-  multiline?: boolean;
-}[] = [
-  {
-    name: "ideaName",
-    label: "Назва ідеї",
-    placeholder: "Наприклад: сервіс оренди павербанків для студентів"
-  },
-  {
-    name: "description",
-    label: "Опис",
-    placeholder: "Коротко опишіть продукт, як він працює і для кого.",
-    multiline: true
-  },
-  {
-    name: "location",
-    label: "Місто / країна",
-    placeholder: "Вінниця, Україна"
-  },
-  {
-    name: "targetAudience",
-    label: "Цільова аудиторія",
-    placeholder: "Хто буде користуватися рішенням?"
-  },
-  {
-    name: "problem",
-    label: "Проблема",
-    placeholder: "Який біль або задачу розв'язує ідея?",
-    multiline: true
-  },
-  {
-    name: "monetization",
-    label: "Монетизація",
-    placeholder: "Погодинна оплата, підписка, партнерства..."
-  },
-  {
-    name: "competitors",
-    label: "Конкуренти",
-    placeholder: "Прямі та непрямі альтернативи"
-  },
-  {
-    name: "resources",
-    label: "Ресурси команди",
-    placeholder: "Команда, бюджет, обмеження, терміни",
-    multiline: true
-  }
+const memoItems = [
+  ["Ринок та аудиторія", "розмір ринку, тренди та цільовий клієнт"],
+  ["Конкуренти та альтернативи", "сильні гравці та ваша перевага"],
+  ["Ризики та припущення", "що може піти не так і як перевірити"],
+  ["MVP та бізнес-модель", "юнiт-економіка та модель зростання"],
+  ["Оцінки та рекомендації", "підсумкова оцінка та наступні кроки"]
+];
+
+const routes = [
+  ["/", "Головна", "зрозуміле позиціювання сервісу"],
+  ["/account", "Кабінет", "баланс, поповнення та історія"],
+  ["/analyze", "Аналіз", "форма з прикладом і списанням $1"],
+  ["/compare", "Порівняння", "обрати найсильнішу ідею з історії"],
+  ["/report", "Звіт", "інфографіка, картки, експорт"],
+  ["/methodology", "Методика", "як читати оцінки й ризики"]
 ];
 
 export default function Home() {
-  const [form, setForm] = useState<IdeaFormData>(emptyForm);
-  const [report, setReport] = useState<AnalysisReport | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const loadingText = useLoadingMessage(loading);
-  const reportText = useMemo(() => (report ? reportToText(report) : ""), [report]);
-
-  function updateField(name: keyof IdeaFormData, value: string) {
-    setForm((current) => ({ ...current, [name]: value }));
-    setError("");
-  }
-
-  function fillExample() {
-    setForm(exampleForm);
-    setReport(null);
-    setError("");
-    document.getElementById("idea-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setCopied(false);
-
-    const validationError = validateForm(form);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Не вдалося сформувати звіт.");
-      }
-
-      setReport(data);
-      setTimeout(() => {
-        document.getElementById("result")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Не вдалося сформувати звіт.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function copyReport() {
-    if (!reportText) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(reportText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  }
-
-  function downloadReport() {
-    if (!reportText) {
-      return;
-    }
-
-    const blob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${slugify(form.ideaName || "startup-analysis")}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function newAnalysis() {
-    setForm(emptyForm);
-    setReport(null);
-    setError("");
-    setCopied(false);
-    document.getElementById("top")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   return (
-    <main id="top" className="min-h-screen bg-slate-50">
-      <section className="border-b border-line bg-white">
-        <div className="mx-auto grid min-h-[620px] max-w-7xl items-center gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-10 lg:py-14">
-          <div className="max-w-2xl">
-            <div className="mb-8 flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-brand text-sm font-black text-white">
-                AI
-              </div>
-              <span className="text-lg font-bold text-ink">IdeaCheck AI</span>
-            </div>
+    <main className="page-shell">
+      <SiteHeader active="home" />
 
-            <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-normal text-ink sm:text-5xl">
-              Швидка первинна оцінка бізнес-ідеї перед запуском
+      <section className="relative overflow-hidden">
+        <div className="relative z-10 mx-auto grid min-h-[650px] max-w-7xl items-center gap-10 px-4 py-12 sm:min-h-[720px] sm:px-8 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
+          <div className="motion-reveal min-w-0">
+            <h1 className="font-display max-w-3xl break-words text-[3.35rem] leading-[0.96] text-emerald-950 sm:text-7xl lg:text-8xl">
+              Перевірте бізнес-ідею до першого запуску
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
-              Початківцям складно зрозуміти, чи варто витрачати час на ідею. Сервіс збирає ключові
-              дані й за хвилину формує зрозумілий звіт для пітчу, обговорення з командою та демо перед журі.
+            <p className="mt-6 max-w-xl text-base leading-7 text-[#26463d] sm:mt-7 sm:text-lg sm:leading-8">
+              IdeaCheck перетворює короткий опис стартапу на практичний звіт: ринок, аудиторія, конкуренти, ризики,
+              бізнес-модель, MVP і підсумкові оцінки.
             </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#idea-form"
-                className="inline-flex h-12 items-center justify-center rounded-lg bg-brand px-6 text-sm font-bold text-white shadow-soft transition hover:bg-[#0b3d68]"
-              >
-                Проаналізувати ідею
-              </a>
-              <button
-                type="button"
-                onClick={fillExample}
-                className="inline-flex h-12 items-center justify-center rounded-lg border border-line bg-white px-6 text-sm font-bold text-brand transition hover:border-brand hover:bg-slate-50"
-              >
-                Заповнити прикладом
-              </button>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link href="/analyze" className="shine btn-primary">
+                Перевірити ідею
+              </Link>
+              <Link href="/methodology" className="btn-secondary">
+                Як працює методика
+              </Link>
             </div>
-
-            <div className="mt-10 grid gap-3 sm:grid-cols-3">
-              {[
-                ["Фокус", "Тільки головні гіпотези та ризики"],
-                ["Швидкість", "Демо працює навіть без API-ключа"],
-                ["Результат", "Звіт можна скопіювати або завантажити"]
-              ].map(([title, text]) => (
-                <div key={title} className="rounded-lg border border-line bg-slate-50 p-4">
-                  <p className="text-sm font-bold text-ink">{title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted">{text}</p>
+            <div className="mt-8 grid gap-3 text-sm text-[#26463d] sm:mt-10 sm:grid-cols-3 sm:gap-4">
+              {["$1 за аналіз", "історія в кабінеті", "звіт за хвилини"].map((item) => (
+                <div key={item} className="border-t border-emerald-950/18 pt-3">
+                  {item}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-slate-50 p-3 shadow-soft">
-            <div className="rounded-lg border border-line bg-white p-5">
-              <div className="flex items-center justify-between gap-4 border-b border-line pb-4">
-                <div>
-                  <p className="text-sm font-bold text-ink">Звіт перевірки стартапу</p>
-                  <p className="mt-1 text-xs text-muted">Ринок, аудиторія, ризики, MVP, оцінки</p>
+          <div className="motion-reveal-slow min-w-0">
+            <div className="premium-card dark-surface motion-float rounded-[26px] p-5 sm:rounded-[30px] sm:p-8">
+              <div className="relative z-10">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#d9e5d5]">Аналітична записка</p>
+                    <h2 className="font-display mt-6 max-w-md text-4xl leading-tight text-[#f8f0df] sm:mt-8 sm:text-5xl">
+                      Пілот варто запускати
+                    </h2>
+                  </div>
+                  <p className="text-xs font-bold text-[#d9e5d5]">IC-2026-0614</p>
                 </div>
-                <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-accent">7.2 / 10</div>
+
+                <div className="mt-8 border-t border-[#f8f0df]/26 pt-7 sm:mt-10 sm:pt-8">
+                  <div className="grid gap-7 md:grid-cols-[0.72fr_1.28fr] md:gap-8">
+                    <div>
+                      <p className="text-sm text-[#d9e5d5]">Загальна оцінка</p>
+                      <p className="font-display mt-4 text-6xl leading-none text-[#f8f0df] sm:text-7xl">7.8</p>
+                      <p className="mt-2 text-sm text-[#d9e5d5]">Хороший потенціал</p>
+                    </div>
+                    <div className="grid gap-3 border-t border-[#f8f0df]/22 pt-5 text-sm md:border-l md:border-t-0 md:pl-7 md:pt-0">
+                      {[
+                        ["Потенціал ринку", "8.0"],
+                        ["Аудиторія", "9.0"],
+                        ["Конкуренція", "7.5"],
+                        ["MVP та модель", "7.0"],
+                        ["Рівень ризику", "середній"]
+                      ].map(([label, value]) => (
+                        <div key={label} className="flex items-center justify-between gap-4 text-[#f4ead8]">
+                          <span>{label}</span>
+                          <span className="font-bold">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-4 border-t border-[#f8f0df]/18 pt-6 md:grid-cols-[1fr_auto]">
+                  <div>
+                    <p className="text-sm font-bold text-[#f8f0df]">Короткий висновок</p>
+                    <p className="mt-2 max-w-md text-sm leading-6 text-[#d9e5d5]">
+                      Ідея має достатній попит і чітку аудиторію. Наступний крок - малий платний пілот.
+                    </p>
+                  </div>
+                  <div className="grid place-items-center rounded-full border border-[#f8f0df]/18 px-5 py-3 text-sm font-bold text-[#f8f0df]">
+                    команда IdeaCheck
+                  </div>
+                </div>
               </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {[
-                  ["Потенціал ринку", "Є можливість для локального пілоту"],
-                  ["Цільова аудиторія", "Студенти та відвідувачі кампусу"],
-                  ["Ризики", "Готовність платити та операції"],
-                  ["MVP", "Ручний пілот із формою заявки"]
-                ].map(([title, text]) => (
-                  <div key={title} className="rounded-lg border border-line bg-white p-4">
-                    <p className="text-sm font-bold text-ink">{title}</p>
-                    <p className="mt-2 text-sm leading-6 text-muted">{text}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="motion-reveal">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-10">
+          <div className="paper-panel rounded-[26px] p-3 sm:rounded-[28px] sm:p-4">
+            <div className="rounded-[20px] border border-line bg-[#fffdf6] p-5 sm:p-6">
+              <div className="grid gap-6 border-b border-line pb-6 md:grid-cols-[1fr_auto] md:items-start">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-950">Аналітична записка</p>
+                  <h2 className="font-display mt-4 text-3xl leading-tight text-emerald-950 sm:text-4xl">Пілот варто запускати</h2>
+                  <p className="mt-4 max-w-xl text-sm leading-7 text-muted">
+                    Один документ збирає висновок, ризики, бізнес-модель і наступні кроки без зайвої презентаційності.
+                  </p>
+                </div>
+                <div className="rounded-full bg-[#dce7db] px-4 py-2 text-sm font-bold text-emerald-950">8.2 / 10</div>
+              </div>
+              <div className="mt-6 grid gap-4">
+                <div className="rounded-[18px] border border-line bg-[#fbf6eb] p-5">
+                  <p className="text-sm font-bold text-emerald-950">Короткий висновок</p>
+                  <p className="mt-3 text-sm leading-7 text-muted">
+                    Ідея має достатній локальний попит і зрозумілий перший сегмент. Почніть з малого платного пілоту,
+                    щоб перевірити готовність платити до розробки повної платформи.
+                  </p>
+                </div>
+                {memoItems.map(([title, text]) => (
+                  <div key={title} className="grid gap-3 border-b border-line pb-3 text-sm last:border-0 sm:grid-cols-[220px_1fr]">
+                    <p className="font-bold text-emerald-950">{title}</p>
+                    <p className="text-muted">{text}</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-5 rounded-lg bg-brand p-5 text-white">
-                <p className="text-sm font-bold">Підсумковий висновок</p>
-                <p className="mt-2 text-sm leading-6 text-blue-50">
-                  Хороший хакатонний MVP, якщо команда рано перевірить готовність платити й звузить перший запуск.
-                </p>
-              </div>
+            </div>
+          </div>
+
+          <div className="min-w-0 self-center">
+            <p className="section-label">Результат</p>
+            <h2 className="font-display mt-4 text-4xl leading-tight text-emerald-950 sm:text-5xl">Звіт виглядає як документ для рішення</h2>
+            <div className="mt-8 grid gap-3">
+              {reportItems.map(([title, text]) => (
+                <div key={title} className="grid gap-1 border-b border-line pb-3 text-sm sm:grid-cols-[120px_1fr] sm:gap-4">
+                  <p className="font-bold text-emerald-950">{title}</p>
+                  <p className="text-muted">{text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:px-10">
-        <form
-          id="idea-form"
-          onSubmit={handleSubmit}
-          className="rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6"
-        >
-          <div className="flex flex-col gap-3 border-b border-line pb-5 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-ink">Дані для аналізу</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                Заповніть поля достатньо конкретно, щоб звіт був корисним для ухвалення рішення.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={fillExample}
-              className="h-10 rounded-lg border border-line bg-white px-4 text-sm font-bold text-brand transition hover:border-brand hover:bg-slate-50"
+      <section className="motion-reveal mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-8 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:px-10">
+        <div className="min-w-0">
+          <p className="section-label">Структура</p>
+          <h2 className="font-display mt-4 break-words text-4xl leading-tight text-emerald-950 sm:text-5xl">
+            Багатосторінковий MVP, який легко показати
+          </h2>
+          <p className="mt-5 max-w-md text-sm leading-7 text-muted">
+            У демо є зрозумілий маршрут: головна пояснює цінність, форма збирає дані, звіт показує результат, методика
+            допомагає читати оцінки.
+          </p>
+        </div>
+        <div className="grid min-w-0 gap-3">
+          {routes.map(([href, title, text]) => (
+            <Link
+              key={href}
+              href={href}
+              className="motion-lift group grid gap-3 rounded-[18px] border border-line bg-[#fffdf6] p-5 transition hover:border-emerald-950/40 hover:bg-white sm:grid-cols-[130px_1fr_auto]"
             >
-              Заповнити прикладом
-            </button>
-          </div>
-
-          <div className="mt-5 grid gap-4">
-            {fields.map((field) => (
-              <label key={field.name} className="block">
-                <span className="text-sm font-bold text-ink">{field.label}</span>
-                {field.multiline ? (
-                  <textarea
-                    value={form[field.name]}
-                    onChange={(event) => updateField(field.name, event.target.value)}
-                    placeholder={field.placeholder}
-                    rows={field.name === "description" ? 4 : 3}
-                    className="mt-2 w-full resize-y rounded-lg border border-line bg-white px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-slate-400 focus:border-accent focus:ring-4 focus:ring-teal-50"
-                  />
-                ) : (
-                  <input
-                    value={form[field.name]}
-                    onChange={(event) => updateField(field.name, event.target.value)}
-                    placeholder={field.placeholder}
-                    className="mt-2 h-11 w-full rounded-lg border border-line bg-white px-4 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-accent focus:ring-4 focus:ring-teal-50"
-                  />
-                )}
-              </label>
-            ))}
-          </div>
-
-          {error ? (
-            <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-              {error}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-6 h-12 w-full rounded-lg bg-accent px-6 text-sm font-bold text-white transition hover:bg-[#0b877a] disabled:cursor-not-allowed disabled:bg-slate-300"
-          >
-            {loading ? loadingText : "Згенерувати аналіз"}
-          </button>
-        </form>
-
-        <div id="result" className="min-h-[520px]">
-          {loading ? <LoadingPanel message={loadingText} /> : null}
-          {!loading && report ? (
-            <ReportView report={report} copied={copied} onCopy={copyReport} onDownload={downloadReport} onNew={newAnalysis} />
-          ) : null}
-          {!loading && !report ? <EmptyReportState /> : null}
+              <span className="min-w-0 text-lg font-semibold text-emerald-950">{title}</span>
+              <span className="min-w-0 text-sm leading-6 text-muted">{text}</span>
+              <span className="text-sm font-bold text-emerald-950 transition group-hover:translate-x-1">Відкрити</span>
+            </Link>
+          ))}
         </div>
       </section>
+
+      <SiteFooter />
     </main>
-  );
-}
-
-function ReportView({
-  report,
-  copied,
-  onCopy,
-  onDownload,
-  onNew
-}: {
-  report: AnalysisReport;
-  copied: boolean;
-  onCopy: () => void;
-  onDownload: () => void;
-  onNew: () => void;
-}) {
-  const cards = [
-    ["Короткий опис", report.summary],
-    ["Потенціал ринку", report.marketPotential],
-    ["Бізнес-модель", report.businessModel],
-    ["MVP", report.mvp],
-    ["Підсумковий висновок", report.finalConclusion]
-  ];
-
-  return (
-    <div className="rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6">
-      <div className="flex flex-col gap-3 border-b border-line pb-5 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-ink">Готовий звіт</h2>
-          <p className="mt-2 text-sm leading-6 text-muted">Структурована первинна оцінка для демо й обговорення.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button onClick={onCopy} className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-brand hover:border-brand">
-            {copied ? "Скопійовано" : "Скопіювати"}
-          </button>
-          <button onClick={onDownload} className="rounded-lg border border-line px-3 py-2 text-sm font-bold text-brand hover:border-brand">
-            Завантажити .txt
-          </button>
-          <button onClick={onNew} className="rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white hover:bg-[#0b3d68]">
-            Новий аналіз
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-4">
-        {cards.map(([title, text]) => (
-          <InfoCard key={title} title={title}>
-            <p>{text}</p>
-          </InfoCard>
-        ))}
-
-        <InfoCard title="Цільова аудиторія">
-          <div className="grid gap-3 sm:grid-cols-2">
-            {report.targetAudience.map((item) => (
-              <div key={`${item.segment}-${item.needs}`} className="rounded-lg bg-slate-50 p-4">
-                <p className="text-sm font-bold text-ink">{item.segment}</p>
-                <p className="mt-1 text-sm leading-6 text-muted">{item.needs}</p>
-              </div>
-            ))}
-          </div>
-        </InfoCard>
-
-        <InfoCard title="Конкуренти">
-          <div className="grid gap-3">
-            {report.competitors.map((item) => (
-              <div key={`${item.name}-${item.type}`} className="rounded-lg border border-line p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-bold text-ink">{item.name}</p>
-                  <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold uppercase text-muted">
-                    {competitorTypeLabel(item.type)}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm leading-6 text-muted">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </InfoCard>
-
-        <InfoCard title="Ризики">
-          <div className="grid gap-3">
-            {report.risks.map((risk) => (
-              <div key={risk.title} className="rounded-lg border border-line p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-bold text-ink">{risk.title}</p>
-                  <span className={riskBadgeClass(risk.level)}>{riskLevelLabel(risk.level)}</span>
-                </div>
-                <p className="mt-2 text-sm leading-6 text-muted">{risk.description}</p>
-                <p className="mt-2 text-sm leading-6 text-ink">
-                  <span className="font-bold">Як зменшити:</span> {risk.mitigation}
-                </p>
-              </div>
-            ))}
-          </div>
-        </InfoCard>
-
-        <InfoCard title="Джерела доходу">
-          <BulletList items={report.revenueStreams} />
-        </InfoCard>
-
-        <InfoCard title="Рекомендації">
-          <BulletList items={report.recommendations} />
-        </InfoCard>
-
-        <InfoCard title="Метрики успіху">
-          <BulletList items={report.successMetrics} />
-        </InfoCard>
-
-        <InfoCard title="Підсумкові оцінки">
-          <div className="grid gap-3 sm:grid-cols-2">
-            {Object.entries(report.scores).map(([label, score]) => (
-              <div key={label} className="rounded-lg bg-slate-50 p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="text-sm font-bold text-ink">{scoreLabel(label)}</p>
-                  <p className="text-sm font-black text-brand">{score}/10</p>
-                </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-accent" style={{ width: `${score * 10}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </InfoCard>
-      </div>
-    </div>
-  );
-}
-
-function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-lg border border-line bg-white p-4">
-      <h3 className="text-sm font-black uppercase tracking-normal text-brand">{title}</h3>
-      <div className="mt-3 text-sm leading-6 text-muted">{children}</div>
-    </section>
-  );
-}
-
-function BulletList({ items }: { items: string[] }) {
-  return (
-    <ul className="grid gap-2">
-      {items.map((item) => (
-        <li key={item} className="flex gap-2 text-sm leading-6 text-muted">
-          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function EmptyReportState() {
-  return (
-    <div className="flex min-h-[520px] items-center justify-center rounded-xl border border-dashed border-line bg-white p-8 text-center">
-      <div>
-        <p className="text-xl font-bold text-ink">Звіт з&apos;явиться тут</p>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
-          Заповніть форму або використайте демо-приклад. Після аналізу тут будуть картки з ринком, ризиками, MVP,
-          рекомендаціями та оцінками.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function LoadingPanel({ message }: { message: string }) {
-  return (
-    <div className="flex min-h-[520px] items-center justify-center rounded-xl border border-line bg-white p-8 shadow-soft">
-      <div className="text-center">
-        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-accent" />
-        <p className="mt-5 text-lg font-bold text-ink">{message}</p>
-        <p className="mt-2 text-sm text-muted">Зазвичай це займає кілька секунд.</p>
-      </div>
-    </div>
-  );
-}
-
-function useLoadingMessage(loading: boolean) {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (!loading) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % loadingMessages.length);
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [loading]);
-
-  return loading ? loadingMessages[index] : loadingMessages[0];
-}
-
-function validateForm(form: IdeaFormData): string {
-  const shortField = fields.find((field) => form[field.name].trim().length < 3);
-
-  if (shortField) {
-    return `Поле "${shortField.label}" занадто коротке. Додайте більше деталей.`;
-  }
-
-  if (form.description.trim().length < 25) {
-    return "Опис занадто короткий. Опишіть ідею хоча б одним повним реченням.";
-  }
-
-  if (form.problem.trim().length < 15) {
-    return "Опис проблеми занадто короткий. Уточніть реальний біль користувача.";
-  }
-
-  return "";
-}
-
-function riskBadgeClass(level: "low" | "medium" | "high") {
-  const base = "rounded-md px-2 py-1 text-xs font-bold uppercase";
-
-  if (level === "high") {
-    return `${base} bg-red-50 text-red-700`;
-  }
-
-  if (level === "medium") {
-    return `${base} bg-amber-50 text-amber-700`;
-  }
-
-  return `${base} bg-emerald-50 text-emerald-700`;
-}
-
-function riskLevelLabel(level: "low" | "medium" | "high") {
-  const labels = {
-    low: "низький",
-    medium: "середній",
-    high: "високий"
-  };
-
-  return labels[level];
-}
-
-function competitorTypeLabel(type: "direct" | "indirect") {
-  return type === "direct" ? "прямий" : "непрямий";
-}
-
-function scoreLabel(label: string) {
-  const labels: Record<string, string> = {
-    marketPotential: "Потенціал ринку",
-    audienceClarity: "Чіткість аудиторії",
-    competitiveness: "Конкурентність",
-    mvpSimplicity: "Простота MVP",
-    riskLevel: "Рівень ризику",
-    overall: "Загальна оцінка"
-  };
-
-  return labels[label] || label;
-}
-
-function slugify(value: string) {
-  return (
-    value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9а-яіїєґ]+/gi, "-")
-      .replace(/^-+|-+$/g, "") || "startup-analysis"
   );
 }

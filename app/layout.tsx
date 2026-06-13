@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "IdeaCheck AI",
-  description: "AI-сервіс первинної оцінки бізнес-ідей і стартапів"
+  title: "IdeaCheck",
+  description: "Сервіс первинної оцінки бізнес-ідей і стартапів"
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="uk" data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   );

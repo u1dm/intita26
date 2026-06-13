@@ -42,3 +42,20 @@ export type AnalysisReport = {
   };
   finalConclusion: string;
 };
+
+export type AnalysisHistoryItem = {
+  id: string;
+  createdAt: string;
+  cost: number;
+  form: IdeaFormData;
+  report: AnalysisReport;
+};
+
+export type DemoAccount = {
+  id: string;
+  name: string;
+  email: string;
+  balance: number;
+  createdAt: string;
+  history: AnalysisHistoryItem[];
+};
