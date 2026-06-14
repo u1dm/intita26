@@ -1,0 +1,54 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+
+      # Авто-редирект HTTP -> HTTPS
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+      # Let's Encrypt
+      - "--certificatesresolvers.le.acme.email=your@email.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+    networks:
+      - proxy
+
+  ideacheck:
+    image: ideacheck:latest
+    restart: unless-stopped
+    container_name: ideacheck
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ideacheck.rule=Host(`ideacheck.chernuha.space`)"
+      - "traefik.http.routers.ideacheck.entrypoints=websecure"
+      - "traefik.http.routers.ideacheck.tls=true"
+      - "traefik.http.routers.ideacheck.tls.certresolver=le"
+      - "traefik.http.services.ideacheck.loadbalancer.server.port=3000"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true
